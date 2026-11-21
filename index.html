@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="es" class="no-transitions" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#fbf8f1">
+  <meta name="description" content="WebMili: lector local de documentos .docx con reproductor integrado de YouTube y Spotify.">
+  <title>WebMili · Lector local de .docx</title>
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/app.css">
+  <script src="js/theme-init.js"></script>
+</head>
+<body>
+  <a class="skip-link" id="skip-link" href="#landing">Saltar al contenido</a>
+
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand__mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H11v18H6.5A2.5 2.5 0 0 1 4 18.5z"/>
+            <path d="M20 5.5A2.5 2.5 0 0 0 17.5 3H13v18h4.5a2.5 2.5 0 0 0 2.5-2.5z"/>
+            <path d="m15.8 9.2-3.1 2.8 3.1 2.8z" fill="currentColor" stroke="none"/>
+          </svg>
+        </span>
+        <span class="brand__name">WebMili</span>
+        <span class="badge badge--proto">Lector local</span>
+      </div>
+
+      <div class="topbar__doc" id="doc-info" hidden>
+        <span class="topbar__doc-name" id="doc-name"></span>
+        <span class="topbar__doc-note" id="doc-meta"></span>
+      </div>
+
+      <div class="topbar__actions">
+        <div class="font-controls" id="font-controls" role="group" aria-label="Tamaño del texto" hidden>
+          <button id="font-decrease" class="icon-button icon-button--text" type="button" aria-label="Reducir el tamaño del texto" title="Texto más pequeño" disabled>−A</button>
+          <button id="font-increase" class="icon-button icon-button--text" type="button" aria-label="Aumentar el tamaño del texto" title="Texto más grande">A+</button>
+        </div>
+
+        <button id="open-file" class="icon-button icon-button--wide" type="button" aria-label="Abrir otro documento .docx" title="Abrir otro .docx" hidden>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/>
+            <path d="M14 3v5h5M12 11v5M9.5 13.5h5"/>
+          </svg>
+          <span class="icon-button__label">Abrir</span>
+        </button>
+
+        <button id="theme-toggle" class="icon-button" type="button" aria-label="Cambiar a tema oscuro" title="Cambiar de tema">
+          <svg class="theme-icon theme-icon--moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M20.5 14.4A8.4 8.4 0 0 1 9.6 3.5 8.5 8.5 0 1 0 20.5 14.4Z"/>
+          </svg>
+          <svg class="theme-icon theme-icon--sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="4"/>
+            <path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"/>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <main class="workspace" id="workspace">
+      <section class="landing" id="landing" tabindex="-1" aria-labelledby="landing-title">
+        <div class="landing__inner">
+          <p class="landing__kicker">Documento local · sin subidas</p>
+          <h1 id="landing-title">Leer un <code>.docx</code> sin sacarlo de tu dispositivo</h1>
+          <p class="landing__lede">WebMili convierte el documento en una página de lectura cómoda. El archivo se procesa dentro de esta pestaña y no se envía a ningún servidor.</p>
+
+          <div class="alert alert--error" id="landing-error" role="alert" hidden>
+            <p id="landing-error-text"></p>
+          </div>
+
+          <input id="file-input" type="file" accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document" multiple hidden>
+
+          <button class="dropzone" id="dropzone" type="button" aria-describedby="dropzone-help">
+            <span class="dropzone__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/>
+                <path d="M14 3v5h5M12 17v-5M9.5 14.5 12 12l2.5 2.5"/>
+              </svg>
+            </span>
+            <span class="dropzone__title">Arrastra tu documento aquí</span>
+            <span class="dropzone__hint">o elige un archivo desde tu equipo</span>
+            <span class="dropzone__cta">Elegir un .docx</span>
+            <span class="dropzone__meta" id="dropzone-help">Solo documentos .docx. A partir de 20 MB avisamos de que puede tardar.</span>
+          </button>
+
+          <p class="landing__privacy">
+            <span class="landing__privacy-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="4" y="10" width="16" height="10" rx="2"/>
+                <path d="M8 10V7a4 4 0 0 1 8 0v3"/>
+              </svg>
+            </span>
+            <span><strong>Tu archivo no sale de aquí.</strong> No hay backend, cuentas, cookies propias ni analítica. El documento se lee con JavaScript en tu navegador.</span>
+          </p>
+
+          <ul class="landing__features">
+            <li>
+              <strong>Se procesa en tu equipo</strong>
+              Ninguna petición transporta el contenido del documento.
+            </li>
+            <li>
+              <strong>Lectura sin ruido</strong>
+              Títulos, listas, tablas e imágenes con una tipografía pensada para leer.
+            </li>
+            <li>
+              <strong>Tema y tamaño</strong>
+              Luz, oscuridad y texto de 16 a 24 px; se recuerdan en este dispositivo.
+            </li>
+          </ul>
+
+          <noscript>
+            <p class="alert alert--error">WebMili necesita JavaScript para leer el documento dentro del navegador. Actívalo y vuelve a cargar la página.</p>
+          </noscript>
+        </div>
+      </section>
+
+      <div class="doc-pane" id="doc-pane" tabindex="-1" aria-label="Documento" hidden>
+        <article class="doc-sheet" id="doc-sheet">
+          <div class="doc-content" id="doc-content"></div>
+
+          <div class="doc-empty" id="doc-empty" hidden>
+            <p class="doc-empty__kicker">Documento vacío</p>
+            <h1>No hay contenido visible</h1>
+            <p>El archivo se abrió, pero no tiene texto, imágenes ni tablas que podamos mostrar. Puede ser un documento en blanco o contener solo elementos que Word no exporta como contenido.</p>
+            <button id="empty-choose" class="button button--primary" type="button">Elegir otro .docx</button>
+          </div>
+        </article>
+      </div>
+
+      <aside class="media-panel" id="media-panel" aria-label="Reproductor multimedia" aria-hidden="true" inert>
+        <div class="media-panel__inner">
+          <header class="media-panel__bar">
+            <span class="media-provider" id="media-provider" data-provider="youtube">YouTube</span>
+            <span class="media-label" id="media-label"></span>
+            <button class="media-close" id="media-close" type="button" aria-label="Cerrar reproductor y volver al documento" title="Cerrar (Esc)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" aria-hidden="true">
+                <path d="M6 6l12 12M18 6 6 18"/>
+              </svg>
+              <span>Cerrar</span>
+            </button>
+            <a class="media-external" id="media-external" href="https://www.youtube.com/" target="_blank" rel="noopener noreferrer">
+              <span>Abrir en YouTube</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M7 17 17 7M7 7h10v10"/>
+              </svg>
+            </a>
+          </header>
+
+          <div class="media-stage" id="media-stage" aria-busy="false">
+            <div class="media-skeleton" id="media-skeleton" aria-hidden="true">
+              <span class="media-skeleton__label">Cargando reproductor…</span>
+            </div>
+          </div>
+
+          <p class="media-note" id="media-note" role="status" hidden></p>
+
+          <div class="media-foot" aria-hidden="true">
+            <div class="media-foot__card">
+              <span class="media-foot__eyebrow">Mientras lees</span>
+              <p><strong>El documento sigue disponible.</strong> Puedes leer y desplazarte mientras el reproductor está abierto; al cerrar, el audio o el video se detiene.</p>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </main>
+  </div>
+
+  <div class="loading-overlay" id="loading-overlay" role="status" aria-live="polite" hidden>
+    <div class="loading-card">
+      <span class="spinner" aria-hidden="true"></span>
+      <p class="loading-title">Preparando el documento…</p>
+      <p class="loading-detail" id="loading-detail"></p>
+    </div>
+  </div>
+
+  <div class="drop-overlay" id="drop-overlay" aria-hidden="true" hidden>
+    <div class="drop-overlay__box">
+      <strong>Suelta el .docx</strong>
+      <span>Se abrirá aquí mismo, sin salir de esta pestaña.</span>
+    </div>
+  </div>
+
+  <div class="toast-region" id="toasts" role="region" aria-label="Avisos"></div>
+
+  <div class="sr-only" id="sr-status" role="status" aria-live="polite" aria-atomic="true"></div>
+
+  <script src="vendor/mammoth.browser.min.js"></script>
+  <script src="vendor/purify.min.js"></script>
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

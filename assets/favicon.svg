@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="WebMili">
+  <rect width="64" height="64" rx="16" fill="#12655a"/>
+  <g fill="none" stroke="#fbf8f1" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M15 18.5A4.5 4.5 0 0 1 19.5 14H28v36h-8.5A4.5 4.5 0 0 1 15 45.5z"/>
+    <path d="M49 18.5A4.5 4.5 0 0 0 44.5 14H36v36h8.5a4.5 4.5 0 0 0 4.5-4.5z"/>
+  </g>
+  <path d="m40.5 26-8 6 8 6z" fill="#fbf8f1"/>
+</svg>
