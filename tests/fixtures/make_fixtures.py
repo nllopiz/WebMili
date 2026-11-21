@@ -443,7 +443,50 @@ def vacio():
     write_docx("documento-vacio.docx", document(body), rels)
 
 
+def medios():
+    body = []
+    body.append(paragraph("Prueba de reproducción", style="Heading1"))
+    body.append(paragraph("Enlaces multimedia", style="Heading2"))
+    body.append(
+        paragraph(
+            style=None,
+            runs=[
+                run("YouTube: "),
+                hyperlink("Demo de YouTube desde el minuto 1:30", rid="rId40"),
+                run(". Playlist: "),
+                hyperlink("Lista de reproducción", rid="rId41"),
+                run("."),
+            ],
+        )
+    )
+    body.append(paragraph("Spotify", style="Heading2"))
+    body.append(
+        paragraph(
+            style=None,
+            runs=[
+                run("Pista: "),
+                hyperlink("Pista de prueba", rid="rId42"),
+                run(". Álbum duplicado: "),
+                hyperlink("Álbum de prueba", rid="rId43"),
+                run(". Repetición: "),
+                hyperlink("Álbum de prueba repetido", rid="rId44"),
+                run("."),
+            ],
+        )
+    )
+
+    rels = relationships(
+        hyperlink_rel("rId40", "https://www.youtube.com/watch?v=dQw4w9WgXcQ&t=1m30s"),
+        hyperlink_rel("rId41", "https://www.youtube.com/playlist?list=PLabcdef123456"),
+        hyperlink_rel("rId42", "https://open.spotify.com/intl-es/track/1234567890abcd"),
+        hyperlink_rel("rId43", "https://open.spotify.com/album/1234567890abcd"),
+        hyperlink_rel("rId44", "https://open.spotify.com/intl-es/album/1234567890abcd"),
+    )
+    write_docx("medios.docx", document("".join(body)), rels)
+
+
 if __name__ == "__main__":
     basico()
     enlaces_peligrosos()
     vacio()
+    medios()

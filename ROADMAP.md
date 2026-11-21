@@ -122,16 +122,16 @@ Lector funcional de `.docx` con estilos, enlaces y preferencias.
 
 ### Tareas
 
-- [ ] Asignar IDs únicos a los encabezados durante el post-procesado.
-- [ ] Construir el índice jerárquico.
-- [ ] Implementar el diálogo del índice con foco y `Escape`.
-- [ ] Implementar el parser puro de YouTube/Spotify.
-- [ ] Añadir badges y estados visuales a los enlaces multimedia.
-- [ ] Extraer y deduplicar los enlaces para la lista de medios.
-- [ ] Implementar el diálogo de la lista de medios.
-- [ ] Mostrar estados vacíos.
-- [ ] Añadir pruebas del parser (recomendado `node:test`).
-- [ ] Probar timestamps, playlists, idiomas de Spotify y enlaces inválidos.
+- [x] Asignar IDs únicos a los encabezados durante el post-procesado.
+- [x] Construir el índice jerárquico.
+- [x] Implementar el diálogo del índice con foco y `Escape`.
+- [x] Implementar el parser puro de YouTube/Spotify.
+- [x] Añadir badges y estados visuales a los enlaces multimedia.
+- [x] Extraer y deduplicar los enlaces para la lista de medios.
+- [x] Implementar el diálogo de la lista de medios.
+- [x] Mostrar estados vacíos.
+- [x] Añadir pruebas del parser con `node:test`.
+- [x] Cubrir timestamps, playlists, idiomas de Spotify y enlaces inválidos.
 
 ### Entregable
 
@@ -139,13 +139,13 @@ Documento navegable con índice y lista de medios; enlaces multimedia reconocido
 
 ### Criterios de aceptación
 
-- [ ] El índice refleja los encabezados y navega al punto correcto.
-- [ ] La lista de medios conserva el orden y deduplica.
-- [ ] Los enlaces multimedia se distinguen visualmente.
-- [ ] Los timestamps de YouTube se interpretan bien.
-- [ ] Los enlaces no soportados se tratan como externos.
-- [ ] Los estados vacíos son claros.
-- [ ] Los diálogos son accesibles.
+- [x] El índice refleja los encabezados y navega al punto correcto.
+- [x] La lista de medios conserva el orden y deduplica.
+- [x] Los enlaces multimedia se distinguen visualmente.
+- [x] Los timestamps de YouTube se interpretan bien.
+- [x] Los enlaces no soportados se tratan como externos.
+- [x] Los estados vacíos son claros.
+- [x] Los diálogos son accesibles.
 
 ---
 
@@ -157,16 +157,16 @@ Documento navegable con índice y lista de medios; enlaces multimedia reconocido
 
 ### Tareas
 
-- [ ] Integrar el panel de medios del prototipo con los enlaces reales.
-- [ ] Construir URLs de embed de YouTube y Spotify.
-- [ ] Crear y destruir iframes correctamente.
-- [ ] Implementar el header del panel, el enlace externo y el esqueleto de carga.
-- [ ] Implementar la sustitución de un medio por otro sin repetir la animación.
-- [ ] Implementar el cierre que detiene el audio/video.
-- [ ] Gestionar foco, `aria-expanded` y anuncios.
-- [ ] Conservar el scroll al abrir/cerrar.
-- [ ] Implementar el fallback sin conexión y el enlace externo.
-- [ ] Recalcular layout en resize y rotación.
+- [x] Integrar el panel de medios del prototipo con los enlaces reales.
+- [x] Construir URLs de embed de YouTube y Spotify.
+- [x] Crear y destruir iframes correctamente.
+- [x] Implementar el header del panel, el enlace externo y el esqueleto de carga.
+- [x] Implementar la sustitución de un medio por otro sin repetir la animación.
+- [x] Implementar el cierre que detiene el audio/video.
+- [x] Gestionar foco, `aria-expanded` y anuncios.
+- [x] Conservar el scroll al abrir/cerrar.
+- [x] Implementar el fallback sin conexión y el enlace externo.
+- [x] Recalcular layout en resize y rotación.
 - [ ] Probar YouTube normal, shorts, directo, playlist y embed bloqueado.
 - [ ] Probar Spotify track, episodio, álbum, playlist, show y artista.
 - [ ] Probar Spotify con y sin sesión.
@@ -179,17 +179,17 @@ Experiencia central completa: leer, abrir medios, seguir leyendo, cerrar y volve
 
 ### Criterios de aceptación
 
-- [ ] Un enlace de YouTube o Spotify abre el panel con animación.
-- [ ] Solo hay un medio activo.
-- [ ] El iframe no parpadea al abrir/cerrar.
-- [ ] El cierre detiene la reproducción.
-- [ ] El foco vuelve al enlace.
-- [ ] El documento conserva la posición de lectura.
-- [ ] El layout cambia correctamente entre escritorio y móvil.
-- [ ] El enlace externo está siempre disponible.
-- [ ] La app sigue siendo usable con teclado.
-- [ ] `prefers-reduced-motion` funciona.
-- [ ] No hay fugas al abrir/cerrar repetidamente.
+- [x] Un enlace de YouTube o Spotify abre el panel con animación.
+- [x] Solo hay un medio activo.
+- [ ] El iframe no parpadea al abrir/cerrar. Pendiente de hardware real.
+- [x] El cierre detiene la reproducción eliminando el iframe.
+- [x] El foco vuelve al enlace.
+- [x] El documento conserva la posición de lectura.
+- [x] El layout cambia correctamente entre escritorio y móvil.
+- [x] El enlace externo está siempre disponible.
+- [x] La app sigue siendo usable con teclado.
+- [x] `prefers-reduced-motion` funciona.
+- [ ] No hay fugas al abrir/cerrar repetidamente. Pendiente de matriz repetida.
 
 ---
 

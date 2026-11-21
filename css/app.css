@@ -343,6 +343,20 @@ a {
   font-weight: 700;
 }
 
+.icon-button__count {
+  display: grid;
+  place-items: center;
+  min-width: 19px;
+  height: 19px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--accent-contrast);
+  font-size: 0.65rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
 .font-controls {
   display: inline-flex;
   align-items: center;
@@ -1146,6 +1160,203 @@ a {
 .media-badge--spotify {
   background: var(--spotify-soft);
   color: var(--spotify);
+}
+
+/* ---------- Índice y lista de medios ---------- */
+
+.navigation-dialog {
+  width: min(420px, calc(100vw - 24px));
+  height: 100vh;
+  height: 100dvh;
+  max-height: 100dvh;
+  margin: 0 0 0 auto;
+  padding: 0;
+  border: 0;
+  border-left: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: -24px 0 60px rgb(61 48 25 / 0.16);
+}
+
+.navigation-dialog::backdrop {
+  background: rgb(17 21 19 / 0.34);
+  backdrop-filter: blur(2px);
+}
+
+.navigation-dialog__header {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 78px;
+  padding: 16px 18px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.navigation-dialog__kicker {
+  margin: 0 0 2px;
+  color: var(--accent);
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.navigation-dialog h2 {
+  margin: 0;
+  font-family: var(--font-ui);
+  font-size: 1.15rem;
+  line-height: 1.2;
+}
+
+.dialog-close {
+  min-height: 44px;
+  padding: 0 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--text-muted);
+  font-family: var(--font-ui);
+  font-size: 0.76rem;
+  font-weight: 700;
+}
+
+.dialog-close:hover {
+  border-color: var(--border-strong);
+  background: var(--surface-soft);
+  color: var(--text);
+}
+
+.toc-list,
+.media-list {
+  max-height: calc(100dvh - 78px);
+  padding: 12px;
+  overflow-y: auto;
+}
+
+.toc-item,
+.media-list-item {
+  width: 100%;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--text);
+  text-align: left;
+}
+
+.toc-item {
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr);
+  align-items: start;
+  gap: 8px;
+  padding: 10px 8px;
+  font-family: var(--font-ui);
+}
+
+.toc-item[data-level="2"] {
+  padding-left: 22px;
+}
+
+.toc-item[data-level="3"] {
+  padding-left: 36px;
+}
+
+.toc-item[data-level="4"] {
+  padding-left: 50px;
+}
+
+.toc-item[data-level="5"] {
+  padding-left: 64px;
+}
+
+.toc-item[data-level="6"] {
+  padding-left: 78px;
+}
+
+.toc-item:hover,
+.media-list-item:hover {
+  background: var(--surface-soft);
+}
+
+.toc-item__level {
+  color: var(--text-faint);
+  font-size: 0.64rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  line-height: 1.9;
+}
+
+.toc-item__label {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  font-size: 0.84rem;
+  font-weight: 650;
+  line-height: 1.5;
+}
+
+.media-list-item {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+  padding: 12px 10px;
+  font-family: var(--font-ui);
+}
+
+.media-list-item__provider {
+  min-width: 62px;
+  padding: 5px 7px;
+  border-radius: 6px;
+  font-size: 0.62rem;
+  font-weight: 800;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.media-list-item__provider--youtube {
+  background: var(--youtube-soft);
+  color: var(--youtube);
+}
+
+.media-list-item__provider--spotify {
+  background: var(--spotify-soft);
+  color: var(--spotify);
+}
+
+.media-list-item__copy {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.media-list-item__label {
+  overflow: hidden;
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.media-list-item__type {
+  color: var(--text-faint);
+  font-size: 0.7rem;
+}
+
+.navigation-empty {
+  margin: 18px 8px;
+  padding: 18px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface-raised);
+  color: var(--text-muted);
+  font-family: var(--font-ui);
+  font-size: 0.82rem;
+  line-height: 1.6;
 }
 
 /* ---------- Carga, arrastre y avisos ---------- */

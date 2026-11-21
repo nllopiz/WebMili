@@ -3,6 +3,8 @@
  * Mammoth y DOMPurify se cargan como scripts vendorizados antes que este módulo.
  */
 
+import { parseMediaUrl, parseMediaTimeLabel } from './links.js';
+
 export const DOCX_MIME =
   'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
 export const LARGE_FILE_BYTES = 20 * 1024 * 1024;
@@ -181,6 +183,42 @@ function enhanceExternalLink(link, url) {
   link.append(note);
 }
 
+function enhanceMediaLink(link, media) {
+  link.href = media.href;
+  link.dataset.media = '';
+  link.dataset.provider = media.provider;
+  link.dataset.type = media.type;
+  link.dataset.id = media.id;
+  link.dataset.embed = media.embedUrl;
+  link.dataset.height = media.height ? String(media.height) : '';
+  link.dataset.start = media.start ? String(media.start) : '';
+  link.classList.add('media-link');
+
+  const visibleText = cleanText(link.textContent);
+  const label = visibleText || (
+    media.provider === 'youtube'
+      ? (media.type === 'playlist' ? 'Lista de YouTube' : 'Video de YouTube')
+      : `${media.type.charAt(0).toUpperCase()}${media.type.slice(1)} de Spotify`
+  );
+  const timeLabel = parseMediaTimeLabel(media);
+
+  link.dataset.label = timeLabel ? `${label} · ${timeLabel}` : label;
+  link.setAttribute('aria-expanded', 'false');
+
+  const badge = document.createElement('span');
+  badge.className = `media-badge media-badge--${media.provider}`;
+  badge.setAttribute('aria-hidden', 'true');
+  badge.textContent = media.provider === 'youtube' ? 'YouTube' : 'Spotify';
+
+  const text = document.createElement('span');
+  text.className = 'media-link__text';
+  text.textContent = visibleText;
+
+  link.replaceChildren(badge);
+  link.append(document.createTextNode(' '));
+  link.append(text);
+}
+
 function markBrokenAnchor(link) {
   link.dataset.brokenAnchor = '';
   link.classList.add('doc-link--broken');
@@ -327,7 +365,13 @@ function prepareLinks(container) {
     }
 
     if (SAFE_EXTERNAL.has(url.protocol)) {
-      enhanceExternalLink(link, url);
+      const media = parseMediaUrl(url.href);
+
+      if (media) {
+        enhanceMediaLink(link, media);
+      } else {
+        enhanceExternalLink(link, url);
+      }
     } else if (SAFE_HANDLER.has(url.protocol)) {
       link.href = url.href;
     } else {

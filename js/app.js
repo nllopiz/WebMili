@@ -36,6 +36,13 @@ const docMeta = document.getElementById('doc-meta');
 const fontControls = document.getElementById('font-controls');
 const fontDecrease = document.getElementById('font-decrease');
 const fontIncrease = document.getElementById('font-increase');
+const tocButton = document.getElementById('toc-button');
+const mediaButton = document.getElementById('media-button');
+const mediaCount = document.getElementById('media-count');
+const tocDialog = document.getElementById('toc-dialog');
+const mediaDialog = document.getElementById('media-dialog');
+const tocList = document.getElementById('toc-list');
+const mediaList = document.getElementById('media-list');
 const skipLink = document.getElementById('skip-link');
 const loadingOverlay = document.getElementById('loading-overlay');
 const loadingDetail = document.getElementById('loading-detail');
@@ -67,6 +74,7 @@ const state = {
   loading: false,
   doc: null,
   headings: [],
+  media: [],
   prefs: readPrefs()
 };
 
@@ -182,6 +190,8 @@ function setView(view, { focus = true } = {}) {
   docPane.hidden = !reader;
   docInfo.hidden = !reader;
   fontControls.hidden = !reader;
+  tocButton.hidden = !reader;
+  mediaButton.hidden = !reader;
   openFileButton.hidden = !reader;
 
   // El enlace «saltar» apunta al primer encabezado cuando existe, para que el
@@ -212,6 +222,8 @@ function updateDocInfo(doc) {
 function showReader(doc, headings) {
   state.doc = doc;
   state.headings = headings;
+  enhanceMediaLinks();
+  updateNavigation();
 
   docContent.hidden = false;
   docEmpty.hidden = true;
@@ -226,6 +238,8 @@ function showReader(doc, headings) {
 function showEmptyDocument(doc) {
   state.doc = doc;
   state.headings = [];
+  state.media = [];
+  updateNavigation();
 
   docContent.innerHTML = '';
   docContent.hidden = true;
@@ -237,6 +251,177 @@ function showEmptyDocument(doc) {
   emptyChoose.focus({ preventScroll: true });
   announce('El documento no tiene contenido visible. Puedes elegir otro archivo.');
 }
+
+/* ---------- Índice y lista de medios ---------- */
+
+function extractMedia() {
+  const unique = new Map();
+
+  docContent.querySelectorAll('.media-link[data-media]').forEach((link) => {
+    const media = mediaFromLink(link);
+
+    if (!media) {
+      return;
+    }
+
+    if (!unique.has(media.key)) {
+      unique.set(media.key, media);
+    }
+  });
+
+  return Array.from(unique.values());
+}
+
+function renderToc() {
+  tocList.replaceChildren();
+
+  if (!state.headings.length) {
+    const empty = document.createElement('p');
+    empty.className = 'navigation-empty';
+    empty.textContent = 'Este documento no tiene encabezados.';
+    tocList.append(empty);
+    return;
+  }
+
+  for (const heading of state.headings) {
+    const item = document.createElement('button');
+    item.type = 'button';
+    item.className = 'toc-item';
+    item.dataset.level = String(heading.level);
+    item.dataset.headingId = heading.id;
+
+    const level = document.createElement('span');
+    level.className = 'toc-item__level';
+    level.textContent = `H${heading.level}`;
+
+    const label = document.createElement('span');
+    label.className = 'toc-item__label';
+    label.textContent = heading.text || 'Sección sin título';
+
+    item.append(level, label);
+    tocList.append(item);
+  }
+}
+
+function renderMediaList() {
+  mediaList.replaceChildren();
+
+  if (!state.media.length) {
+    const empty = document.createElement('p');
+    empty.className = 'navigation-empty';
+    empty.textContent = 'Este documento no contiene enlaces de YouTube o Spotify.';
+    mediaList.append(empty);
+    return;
+  }
+
+  state.media.forEach((media, index) => {
+    const item = document.createElement('button');
+    item.type = 'button';
+    item.className = 'media-list-item';
+    item.dataset.mediaIndex = String(index);
+
+    const provider = document.createElement('span');
+    provider.className = `media-list-item__provider media-list-item__provider--${media.provider}`;
+    provider.textContent = media.provider === 'youtube' ? 'YouTube' : 'Spotify';
+
+    const copy = document.createElement('span');
+    copy.className = 'media-list-item__copy';
+
+    const label = document.createElement('span');
+    label.className = 'media-list-item__label';
+    label.textContent = media.label;
+
+    const type = document.createElement('span');
+    type.className = 'media-list-item__type';
+    type.textContent = TYPE_LABELS[media.type] || media.type;
+
+    copy.append(label, type);
+    item.append(provider, copy);
+    mediaList.append(item);
+  });
+}
+
+function updateNavigation() {
+  state.media = extractMedia();
+  renderToc();
+  renderMediaList();
+
+  mediaCount.textContent = String(state.media.length);
+  mediaCount.hidden = state.media.length === 0;
+  mediaButton.setAttribute(
+    'aria-label',
+    `Abrir lista de medios. ${state.media.length} ${state.media.length === 1 ? 'enlace único' : 'enlaces únicos'}`
+  );
+}
+
+function openNavigationDialog(dialog) {
+  if (!dialog.open) {
+    dialog.showModal();
+  }
+}
+
+function closeNavigationDialog(dialog) {
+  if (dialog.open) {
+    dialog.close();
+  }
+}
+
+tocButton.addEventListener('click', () => openNavigationDialog(tocDialog));
+mediaButton.addEventListener('click', () => openNavigationDialog(mediaDialog));
+
+document.querySelectorAll('[data-close-dialog]').forEach((button) => {
+  button.addEventListener('click', () => {
+    const dialog = button.dataset.closeDialog === 'toc-dialog' ? tocDialog : mediaDialog;
+    closeNavigationDialog(dialog);
+  });
+});
+
+[tocDialog, mediaDialog].forEach((dialog) => {
+  dialog.addEventListener('click', (event) => {
+    if (event.target === dialog) {
+      closeNavigationDialog(dialog);
+    }
+  });
+});
+
+tocList.addEventListener('click', (event) => {
+  const item = event.target.closest('.toc-item');
+
+  if (!item) {
+    return;
+  }
+
+  const target = document.getElementById(item.dataset.headingId);
+
+  if (!target || !docContent.contains(target)) {
+    return;
+  }
+
+  closeNavigationDialog(tocDialog);
+  target.scrollIntoView({
+    behavior: motionQuery.matches ? 'auto' : 'smooth',
+    block: 'start'
+  });
+  target.focus({ preventScroll: true });
+  announce(`Sección: ${target.textContent.trim().slice(0, 90)}`);
+});
+
+mediaList.addEventListener('click', (event) => {
+  const item = event.target.closest('.media-list-item');
+
+  if (!item) {
+    return;
+  }
+
+  const media = state.media[Number(item.dataset.mediaIndex)];
+
+  if (!media) {
+    return;
+  }
+
+  closeNavigationDialog(mediaDialog);
+  openMedia(media, media.trigger);
+});
 
 /* ---------- Carga de archivos ---------- */
 

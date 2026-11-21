@@ -2,8 +2,8 @@
 
 Lector local de documentos `.docx` con reproductor integrado de YouTube y Spotify. Aplicación web estática, sin backend, sin cuentas y sin subida de archivos.
 
-> **Estado actual: Hito 1 — lector local de `.docx` implementado y validado automáticamente.**
-> La app abre un `.docx` con Mammoth, lo sanea con DOMPurify y lo muestra con su propio estilo de lectura. El panel de YouTube/Spotify del Hito 0 se conserva en el código, pero todavía no se conecta a los enlaces del documento (Hitos 2 y 3). Falta la prueba manual en dispositivos reales.
+> **Estado actual: Hitos 0, 1, 2 y 3 implementados; falta cerrar las pruebas manuales y el Hito 4 de persistencia.**
+> La app abre un `.docx`, genera el índice de encabezados, reconoce enlaces de YouTube y Spotify, muestra una lista deduplicada y reproduce medios en el panel integrado.
 
 ---
 
@@ -57,6 +57,7 @@ Para probar el lector, arrastra uno de los documentos ficticios de `tests/fixtur
 - `lectura-basica.docx`: títulos, listas, tabla, imagen, enlaces internos y externos.
 - `enlaces-peligrosos.docx`: protocolos peligrosos, ancla rota y enlaces permitidos.
 - `documento-vacio.docx`: estado sin contenido visible.
+- `medios.docx`: enlaces de YouTube, playlist y Spotify para probar el reproductor.
 
 Se regeneran con `python tests/fixtures/make_fixtures.py`. No contienen datos personales.
 

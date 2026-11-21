@@ -2,7 +2,7 @@
 
 > **Documento de entrada.** Leer antes de trabajar en WebMili.
 > **Última actualización:** 2026-11-21
-> **Estado:** Hitos 0 y 1 implementados y validados con pruebas automatizadas en Chrome. Cierre formal pendiente de una prueba manual en dispositivo real.
+> **Estado:** Hitos 0, 1, 2 y 3 implementados. Cierre formal pendiente de pruebas manuales y persistencia del Hito 4.
 > **Ubicación:** `C:\Users\norll\OneDrive\Documents\ProyectosSDD\WebMili`.
 > **Próximo paso:** Hito 2 — índice, parser de medios y badges.
 
