@@ -201,11 +201,11 @@ Experiencia central completa: leer, abrir medios, seguir leyendo, cerrar y volve
 
 ### Tareas
 
-- [ ] Implementar IndexedDB para el último documento y el scroll.
-- [ ] Restaurar documento y posición al recargar.
-- [ ] Implementar "Recordar en este dispositivo" y "Olvidar documento".
-- [ ] Manejar cuota, errores de almacenamiento y documentos ilegibles.
-- [ ] Solicitar almacenamiento persistente si está disponible.
+- [x] Implementar IndexedDB para el último documento y el scroll.
+- [x] Restaurar documento y posición al recargar.
+- [x] Implementar "Recordar en este dispositivo" y "Olvidar documento".
+- [x] Manejar cuota, errores de almacenamiento y documentos ilegibles.
+- [x] Solicitar almacenamiento persistente si está disponible.
 - [ ] Revisar accesibilidad completa: teclado, foco, diálogos, iframes, contraste, movimiento reducido.
 - [ ] Probar con lector de pantalla.
 - [ ] Revisar seguridad: DOMPurify, protocolos, imágenes, iframes.

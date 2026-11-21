@@ -1359,6 +1359,88 @@ a {
   line-height: 1.6;
 }
 
+.settings-dialog {
+  width: min(440px, calc(100vw - 24px));
+  margin: auto;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: var(--shadow-soft);
+}
+
+.settings-dialog::backdrop {
+  background: rgb(17 21 19 / 0.34);
+  backdrop-filter: blur(2px);
+}
+
+.settings-dialog__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 78px;
+  padding: 16px 18px;
+  border-bottom: 1px solid var(--border);
+}
+
+.settings-dialog__header h2 {
+  margin: 0;
+  font-family: var(--font-ui);
+  font-size: 1.15rem;
+}
+
+.settings-dialog__body {
+  display: grid;
+  gap: 18px;
+  padding: 18px;
+}
+
+.settings-toggle {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  font-family: var(--font-ui);
+  cursor: pointer;
+}
+
+.settings-toggle span {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.settings-toggle strong {
+  font-size: 0.86rem;
+}
+
+.settings-toggle small {
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  line-height: 1.5;
+}
+
+.settings-toggle input {
+  flex: 0 0 auto;
+  width: 44px;
+  height: 24px;
+  margin: 2px 0 0;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+.button--danger {
+  border-color: color-mix(in srgb, var(--danger) 38%, var(--border));
+  background: transparent;
+  color: var(--danger);
+}
+
+.button--danger:hover {
+  background: color-mix(in srgb, var(--danger) 10%, var(--surface));
+}
+
 /* ---------- Carga, arrastre y avisos ---------- */
 
 .loading-overlay {

@@ -63,6 +63,13 @@
           <span class="icon-button__label">Abrir</span>
         </button>
 
+        <button id="settings-button" class="icon-button" type="button" aria-label="Abrir ajustes de almacenamiento" title="Ajustes">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="3"/>
+            <path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-1.42 1.42-.06-.06A1.7 1.7 0 0 0 16.44 18a1.7 1.7 0 0 0-1 .6l-.08.1V19h-2v-.3l-.08-.1a1.7 1.7 0 0 0-1-.6 1.7 1.7 0 0 0-1.88.34l-.06.06-1.42-1.42.06-.06A1.7 1.7 0 0 0 9.3 15a1.7 1.7 0 0 0-.6-1l-.1-.08H8.3v-2h.3l.1-.08a1.7 1.7 0 0 0 .6-1 1.7 1.7 0 0 0-.34-1.88l-.06-.06 1.42-1.42.06.06A1.7 1.7 0 0 0 12.26 8a1.7 1.7 0 0 0 1-.6l.08-.1h.3v.3l.08.1a1.7 1.7 0 0 0 1 .6 1.7 1.7 0 0 0 1.88-.34l.06-.06 1.42 1.42-.06.06A1.7 1.7 0 0 0 17.7 12a1.7 1.7 0 0 0 .6 1l.1.08h.3v2h-.3l-.1.08a1.7 1.7 0 0 0-.6 1z"/>
+          </svg>
+        </button>
+
         <button id="theme-toggle" class="icon-button" type="button" aria-label="Cambiar a tema oscuro" title="Cambiar de tema">
           <svg class="theme-icon theme-icon--moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M20.5 14.4A8.4 8.4 0 0 1 9.6 3.5 8.5 8.5 0 1 0 20.5 14.4Z"/>
@@ -222,6 +229,26 @@
       <button class="dialog-close" type="button" data-close-dialog="media-dialog" aria-label="Cerrar lista de medios">Cerrar</button>
     </div>
     <div class="media-list" id="media-list" aria-label="Lista de medios del documento"></div>
+  </dialog>
+
+  <dialog class="settings-dialog" id="settings-dialog" aria-labelledby="settings-title">
+    <div class="settings-dialog__header">
+      <div>
+        <p class="navigation-dialog__kicker">Privacidad</p>
+        <h2 id="settings-title">Ajustes</h2>
+      </div>
+      <button class="dialog-close" type="button" data-close-dialog="settings-dialog" aria-label="Cerrar ajustes">Cerrar</button>
+    </div>
+    <div class="settings-dialog__body">
+      <label class="settings-toggle">
+        <span>
+          <strong>Recordar en este dispositivo</strong>
+          <small>Guarda el último .docx y la posición de lectura. El documento no se cifra.</small>
+        </span>
+        <input id="remember-toggle" type="checkbox" checked>
+      </label>
+      <button id="forget-document" class="button button--danger" type="button">Olvidar documento</button>
+    </div>
   </dialog>
 
   <script src="vendor/mammoth.browser.min.js"></script>

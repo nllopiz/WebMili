@@ -19,6 +19,8 @@ Lector local de documentos `.docx` con reproductor integrado de YouTube y Spotif
 - Enlaces con `javascript:`, `data:` u otros protocolos no permitidos se neutralizan y avisan al pulsarlos; las anclas rotas se marcan.
 - Estados de carga, documento vacío y error comprensible.
 - Tema claro/oscuro y tamaño de letra de 16 a 24 px, persistidos en `localStorage`.
+- Recordar el último `.docx` y su posición de lectura mediante IndexedDB.
+- Ajustes locales para desactivar el guardado o olvidar el documento.
 - Respeto por `prefers-reduced-motion`.
 - Navegación por teclado, enlace «saltar al documento» y anuncios `aria-live`.
 

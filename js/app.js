@@ -5,6 +5,7 @@
 
 import {
   convertDocx,
+  DOCX_MIME,
   hasVisibleContent,
   prepareDocument,
   validateDocxFile
@@ -18,6 +19,12 @@ import {
   readPrefs,
   writePrefs
 } from './storage.js';
+
+import {
+  deleteLastDocument,
+  readLastDocument,
+  saveLastDocument
+} from './persistence.js';
 
 const landing = document.getElementById('landing');
 const landingError = document.getElementById('landing-error');
@@ -62,6 +69,10 @@ const mediaLabel = document.getElementById('media-label');
 const mediaExternal = document.getElementById('media-external');
 const mediaClose = document.getElementById('media-close');
 const mediaNote = document.getElementById('media-note');
+const settingsButton = document.getElementById('settings-button');
+const settingsDialog = document.getElementById('settings-dialog');
+const rememberToggle = document.getElementById('remember-toggle');
+const forgetButton = document.getElementById('forget-document');
 
 const desktopQuery = window.matchMedia('(min-width: 900px)');
 const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -114,6 +125,8 @@ let resizeFrame = 0;
 let announceTimer = 0;
 let anchorFrame = 0;
 let dragDepth = 0;
+let scrollSaveTimer = 0;
+let restoringDocument = false;
 
 /* ---------- Utilidades ---------- */
 
@@ -219,7 +232,7 @@ function updateDocInfo(doc) {
     : 'Procesado en este dispositivo';
 }
 
-function showReader(doc, headings) {
+function showReader(doc, headings, { restoreScroll = 0 } = {}) {
   state.doc = doc;
   state.headings = headings;
   enhanceMediaLinks();
@@ -232,6 +245,23 @@ function showReader(doc, headings) {
   setView('reader', { focus: false });
   docPane.scrollTop = 0;
   docPane.focus({ preventScroll: true });
+
+  if (restoreScroll > 0) {
+    restoringDocument = true;
+    window.requestAnimationFrame(() => {
+      window.requestAnimationFrame(() => {
+        const images = Array.from(docContent.querySelectorAll('img'));
+        Promise.all(images.map((image) => image.decode ? image.decode().catch(() => {}) : Promise.resolve()))
+          .finally(() => {
+            docPane.scrollTop = restoreScroll;
+            window.requestAnimationFrame(() => {
+              restoringDocument = false;
+            });
+          });
+      });
+    });
+  }
+
   announce(`Documento abierto: ${doc.name}.`);
 }
 
@@ -250,6 +280,69 @@ function showEmptyDocument(doc) {
   docPane.scrollTop = 0;
   emptyChoose.focus({ preventScroll: true });
   announce('El documento no tiene contenido visible. Puedes elegir otro archivo.');
+}
+
+/* ---------- Persistencia local ---------- */
+
+async function persistCurrentDocument(scrollTop = docPane.scrollTop) {
+  if (!state.doc || !(state.doc instanceof Blob) || !state.prefs.remember) {
+    return;
+  }
+
+  try {
+    await saveLastDocument({
+      blob: state.doc,
+      name: state.doc.name,
+      size: state.doc.size,
+      scrollTop: Math.max(0, Math.round(scrollTop)),
+      savedAt: Date.now()
+    });
+  } catch (error) {
+    state.prefs = writePrefs({ ...state.prefs, remember: false });
+    if (rememberToggle) {
+      rememberToggle.checked = false;
+    }
+    showToast(
+      'No se pudo guardar el documento en este dispositivo. La lectura seguirá funcionando, pero no podrá restaurarse.',
+      'warning',
+      9000
+    );
+  }
+}
+
+function scheduleScrollSave() {
+  if (restoringDocument || !state.prefs.remember || state.view !== 'reader') {
+    return;
+  }
+
+  window.clearTimeout(scrollSaveTimer);
+  scrollSaveTimer = window.setTimeout(() => {
+    persistCurrentDocument(docPane.scrollTop);
+  }, 300);
+}
+
+async function restoreLastDocument() {
+  if (!state.prefs.remember) {
+    return;
+  }
+
+  try {
+    const record = await readLastDocument();
+
+    if (!record || !(record.blob instanceof Blob)) {
+      return;
+    }
+
+    const file = new File([record.blob], record.name || 'Documento recuperado.docx', {
+      type: DOCX_MIME,
+      lastModified: record.savedAt || Date.now()
+    });
+
+    await handleFile(file, { restoring: true, restoreScroll: Number(record.scrollTop) || 0 });
+  } catch (error) {
+    await deleteLastDocument().catch(() => {});
+    showLandingError('No pudimos restaurar el documento guardado. Puede haberse eliminado o estar dañado.');
+  }
 }
 
 /* ---------- Índice y lista de medios ---------- */
@@ -371,12 +464,17 @@ mediaButton.addEventListener('click', () => openNavigationDialog(mediaDialog));
 
 document.querySelectorAll('[data-close-dialog]').forEach((button) => {
   button.addEventListener('click', () => {
-    const dialog = button.dataset.closeDialog === 'toc-dialog' ? tocDialog : mediaDialog;
+    const dialog =
+      button.dataset.closeDialog === 'toc-dialog'
+        ? tocDialog
+        : button.dataset.closeDialog === 'media-dialog'
+          ? mediaDialog
+          : settingsDialog;
     closeNavigationDialog(dialog);
   });
 });
 
-[tocDialog, mediaDialog].forEach((dialog) => {
+[tocDialog, mediaDialog, settingsDialog].forEach((dialog) => {
   dialog.addEventListener('click', (event) => {
     if (event.target === dialog) {
       closeNavigationDialog(dialog);
@@ -460,7 +558,7 @@ function handleFiles(fileList) {
   handleFile(files[0]);
 }
 
-async function handleFile(file) {
+async function handleFile(file, { restoring = false, restoreScroll = 0 } = {}) {
   if (state.loading) {
     return;
   }
@@ -518,7 +616,11 @@ async function handleFile(file) {
       return;
     }
 
-    showReader(file, headings);
+    showReader(file, headings, { restoreScroll });
+
+    if (!restoring && state.prefs.remember) {
+      await persistCurrentDocument(restoreScroll);
+    }
   } catch (error) {
     console.error('[WebMili] No se pudo convertir el documento:', error);
 
@@ -1231,6 +1333,67 @@ window.addEventListener('offline', updateConnectionNote);
 
 /* ---------- Eventos de la interfaz ---------- */
 
+rememberToggle.checked = state.prefs.remember;
+
+settingsButton.addEventListener('click', () => {
+  rememberToggle.checked = state.prefs.remember;
+  openNavigationDialog(settingsDialog);
+});
+
+rememberToggle.addEventListener('change', async () => {
+  state.prefs = writePrefs({ ...state.prefs, remember: rememberToggle.checked });
+
+  if (!rememberToggle.checked) {
+    try {
+      await deleteLastDocument();
+      showToast('El documento guardado se olvidó.', 'info');
+      announce('Recordar en este dispositivo desactivado.');
+    } catch (error) {
+      showToast('No se pudo borrar el documento guardado.', 'error');
+    }
+  } else {
+    await persistCurrentDocument(docPane.scrollTop);
+    announce('Recordar en este dispositivo activado.');
+  }
+});
+
+forgetButton.addEventListener('click', async () => {
+  try {
+    await deleteLastDocument();
+  } catch (error) {
+    showToast('No se pudo borrar el documento guardado.', 'error');
+  }
+
+  if (isOpen) {
+    closeMedia();
+  }
+
+  state.doc = null;
+  state.headings = [];
+  state.media = [];
+  docContent.innerHTML = '';
+  docPane.scrollTop = 0;
+  closeNavigationDialog(settingsDialog);
+  clearLandingError();
+  setView('landing');
+  showToast('Documento olvidado.', 'info');
+  announce('Documento olvidado. Has vuelto a la pantalla inicial.');
+});
+
+docPane.addEventListener('scroll', scheduleScrollSave, { passive: true });
+
+window.addEventListener('beforeunload', () => {
+  if (state.prefs.remember && state.view === 'reader' && state.doc) {
+    persistCurrentDocument(docPane.scrollTop);
+  }
+});
+
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'hidden' && state.prefs.remember && state.view === 'reader') {
+    persistCurrentDocument(docPane.scrollTop);
+  }
+});
+
 dropzone.addEventListener('click', chooseFile);
 openFileButton.addEventListener('click', chooseFile);
 emptyChoose.addEventListener('click', chooseFile);
@@ -1254,6 +1417,7 @@ applyFontSize(state.prefs.fontSize);
 syncThemeButton();
 setView('landing', { focus: false });
 enhanceMediaLinks();
+restoreLastDocument();
 
 window.requestAnimationFrame(() => {
   window.requestAnimationFrame(() => {
