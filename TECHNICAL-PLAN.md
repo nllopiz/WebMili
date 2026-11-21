@@ -13,7 +13,7 @@ WebMili será una aplicación estática de una sola página, sin backend ni paso
 
 La prioridad técnica es que la composición y la animación se sientan estables, que el documento nunca salga del dispositivo y que el cierre del medio detenga realmente la reproducción.
 
-> **Implementación actual (Hito 0):** `index.html`, `css/app.css`, `js/app.js` y `js/theme-init.js`. El prototipo todavía no carga `.docx` y concentra el ciclo del panel, el layout, el tema y el scroll en `app.js`. `vendor/` ya contiene Mammoth.js, DOMPurify 3.2.6 y sus licencias, pero `index.html` no los carga. La estructura modular de la sección 4 es el objetivo a partir del Hito 1.
+> **Implementación actual (Hito 1):** `index.html`, `css/app.css`, `js/app.js`, `js/docx.js`, `js/storage.js` y `js/theme-init.js`. `index.html` carga Mammoth y DOMPurify desde `vendor/`; `docx.js` valida, convierte y sanea el documento, y `app.js` conserva el ciclo del panel, el layout, el tema y el scroll. La separación de `links.js`, `media.js` y `ui.js` sigue pendiente para los Hitos 2 y 3.
 
 ---
 
@@ -47,7 +47,7 @@ La prioridad técnica es que la composición y la animación se sientan estables
 | Mammoth.js (`mammoth.browser.min.js`) | Convertir `.docx` a HTML semántico | UMD; expone `window.mammoth` |
 | DOMPurify (`purify.min.js`) | Sanear el HTML generado | UMD; expone `window.DOMPurify` |
 
-Mammoth incluye sus dependencias (incluido JSZip) en el build de navegador. No se necesita instalar nada en runtime. Las librerías y sus licencias ya están en `vendor/`; falta integrarlas en el Hito 1.
+Mammoth incluye sus dependencias (incluido JSZip) en el build de navegador. No se necesita instalar nada en runtime. Las librerías y sus licencias están en `vendor/` y `index.html` las carga antes de `js/app.js`.
 
 ### Herramientas de desarrollo
 
@@ -89,7 +89,7 @@ WebMili/
 └─ README.md
 ```
 
-**Estado del Hito 0:** existen `index.html`, `css/app.css`, `js/app.js`, `js/theme-init.js`, `assets/favicon.svg`, `vendor/` (Mammoth, DOMPurify y licencias, aún sin cargar) y los documentos del proyecto. `app.js` asume temporalmente las responsabilidades de `media.js`, `ui.js` y parte de `storage.js`. El desglose se hará al añadir el lector real, sin cambiar el comportamiento validado.
+**Estado del Hito 1:** existen `index.html`, `css/app.css`, `js/app.js`, `js/docx.js`, `js/storage.js`, `js/theme-init.js`, `assets/favicon.svg`, `vendor/` (Mammoth, DOMPurify y licencias, ya cargados), `tests/fixtures/` y los documentos del proyecto. `app.js` asume todavía las responsabilidades de `media.js` y `ui.js`; el desglose se hará al conectar los medios en el Hito 3, sin cambiar el comportamiento validado.
 
 ### Responsabilidades
 
@@ -117,7 +117,7 @@ WebMili/
 - Scripts vendorizados al final del `<body>`.
 - Módulo principal `js/app.js`.
 
-**Hito 0:** el documento de ejemplo, el enlace "Saltar al documento", el panel de medios y la región `aria-live` ya están en el HTML; todavía no existen landing, diálogos, toasts ni scripts vendorizados.
+**Hito 1:** la landing, el lector, el enlace «Saltar al documento», el panel de medios, los toasts, la región `aria-live` y los scripts vendorizados ya están en el HTML. Faltan los diálogos de índice y lista de medios (Hito 2).
 
 Orden de carga:
 

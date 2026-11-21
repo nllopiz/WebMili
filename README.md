@@ -2,37 +2,35 @@
 
 Lector local de documentos `.docx` con reproductor integrado de YouTube y Spotify. Aplicación web estática, sin backend, sin cuentas y sin subida de archivos.
 
-> **Estado actual: Hito 0 — prototipo de composición implementado y validado automáticamente.**
-> Todavía no se abren archivos `.docx`. Esta versión valida la pieza más arriesgada: la convivencia del documento con un `iframe` y la animación del panel. Falta la prueba manual en dispositivos reales.
+> **Estado actual: Hito 1 — lector local de `.docx` implementado y validado automáticamente.**
+> La app abre un `.docx` con Mammoth, lo sanea con DOMPurify y lo muestra con su propio estilo de lectura. El panel de YouTube/Spotify del Hito 0 se conserva en el código, pero todavía no se conecta a los enlaces del documento (Hitos 2 y 3). Falta la prueba manual en dispositivos reales.
 
 ---
 
 ## Qué puedes probar ahora
 
-- Documento de ejemplo con texto, listas, tabla y enlaces multimedia.
-- Enlace real de YouTube (`Big Buck Bunny`, Blender Foundation).
-- Enlace real de Spotify (`Deep Focus`, lista de reproducción).
-- Panel integrado que se abre al pulsar un enlace.
-- En escritorio: documento a la izquierda, reproductor a la derecha.
-- En móvil: reproductor arriba, documento abajo, con scroll propio.
-- Transición de apertura y cierre de ~320 ms.
-- El `iframe` mantiene su tamaño final dentro de un contenedor recortado para no parpadear.
-- Cierre con el botón **Cerrar** o con `Esc`; al cerrar se destruye el `iframe` y se detiene el audio/video.
-- Cambio de medio sin repetir la animación de apertura. Solo hay un medio activo.
-- Tema claro/oscuro persistido en `localStorage` (`webmili:prefs:v1`), sin destello al cargar.
+- Elegir un `.docx` con el selector o arrastrarlo y soltarlo sobre la ventana.
+- Validación de formato: rechaza `.doc`, PDF, archivos vacíos y otros formatos con un mensaje claro.
+- Aviso no bloqueante para archivos de más de 20 MB; si se sueltan varios, se abre el primero y se informa.
+- Conversión local con Mammoth.js y saneado con DOMPurify antes de insertar el HTML.
+- Títulos, párrafos, listas, tablas, imágenes, énfasis y enlaces.
+- Tablas con desplazamiento horizontal accesible por teclado e imágenes con carga diferida.
+- Enlaces externos en pestaña nueva; enlaces internos con desplazamiento al encabezado.
+- Enlaces con `javascript:`, `data:` u otros protocolos no permitidos se neutralizan y avisan al pulsarlos; las anclas rotas se marcan.
+- Estados de carga, documento vacío y error comprensible.
+- Tema claro/oscuro y tamaño de letra de 16 a 24 px, persistidos en `localStorage`.
 - Respeto por `prefers-reduced-motion`.
-- Tabla con desplazamiento horizontal accesible por teclado.
+- Navegación por teclado, enlace «saltar al documento» y anuncios `aria-live`.
 
 ## Qué no incluye todavía
 
-- Carga de archivos `.docx` (selector o arrastrar y soltar).
-- Integración de Mammoth.js y DOMPurify: las librerías ya están en `vendor/`, pero el prototipo no las carga.
-- Índice de contenidos y lista de medios.
+- Índice de contenidos y lista de medios (Hito 2).
+- Detección y badges de enlaces de YouTube/Spotify dentro del documento (Hito 2).
+- Reproductor conectado a enlaces reales del `.docx`: el panel existe, pero aún no recibe enlaces del documento (Hito 3).
 - Persistencia del documento y de la posición de lectura en IndexedDB.
-- Controles de tamaño de letra.
-- Reproductor conectado a enlaces reales de un documento: los dos enlaces del prototipo están definidos en el HTML.
+- Prueba manual en móvil real, Safari/Firefox y lector de pantalla.
 
-El orden de trabajo está en [`ROADMAP.md`](ROADMAP.md). El lector real empieza en el Hito 1.
+Los documentos de ejemplo son ficticios y viven en `tests/fixtures/`. El orden de trabajo está en [`ROADMAP.md`](ROADMAP.md).
 
 ---
 
@@ -54,22 +52,38 @@ npx serve .
 
 Después abre <http://localhost:8080>.
 
-También puedes usar la extensión Live Server de VS Code.
+Para probar el lector, arrastra uno de los documentos ficticios de `tests/fixtures/`:
+
+- `lectura-basica.docx`: títulos, listas, tabla, imagen, enlaces internos y externos.
+- `enlaces-peligrosos.docx`: protocolos peligrosos, ancla rota y enlaces permitidos.
+- `documento-vacio.docx`: estado sin contenido visible.
+
+Se regeneran con `python tests/fixtures/make_fixtures.py`. No contienen datos personales.
 
 ### Probar el comportamiento responsive
 
-1. Abre la página a 1440 px de ancho y pulsa el enlace de YouTube.
-2. Reduce la ventana hasta cruzar los 900 px: la composición pasa de columnas a filas sin recargar el reproductor.
-3. Prueba a 320 px: no debe aparecer scroll horizontal.
-4. En móvil, comprueba que el reproductor queda arriba y el documento abajo.
-5. Activa la emulación de `prefers-reduced-motion` en las herramientas de desarrollo y repite la apertura: no debe haber animación.
-6. Cierra con `Esc` y con el botón; en ambos casos el audio/video debe detenerse.
+1. Abre la página a 1440 px de ancho y carga `tests/fixtures/lectura-basica.docx`.
+2. Comprueba la tabla y la imagen; la tabla se desplaza en horizontal si no cabe.
+3. Reduce la ventana hasta 320 px: no debe aparecer scroll horizontal y el texto debe seguir siendo legible.
+4. Prueba el tema oscuro y el tamaño de letra; recarga y comprueba que se recuerdan.
+5. Activa la emulación de `prefers-reduced-motion` y repite la apertura y los saltos internos: no debe haber animación.
+6. Recorre la interfaz con `Tab`, activa el enlace «saltar» y los enlaces internos con `Enter`.
 
-> YouTube y Spotify necesitan conexión. Los embeds pueden estar limitados por el autor, la región, la edad o la configuración de cookies del navegador. El enlace externo del panel es el plan B.
+> El documento se procesa dentro de la pestaña. La prueba automatizada verifica que no hay peticiones POST ni cuerpos de subida.
 
-### Validación del prototipo
+### Validación del Hito 1
 
-Última pasada: **2026-11-20**, Chrome estable en Windows, modo headless.
+Última pasada: **2026-11-21**, Chrome headless en Windows.
+
+- **11/11** pruebas Playwright: landing, apertura, estructura, tabla, imagen, enlaces, `javascript:`/`data:`, ancla rota, documento vacío, PDF, varios archivos, persistencia, ausencia de subidas, drag & drop real, aviso de 20 MB, teclado y responsive a 320/1440 px.
+- **0** errores de página durante las pruebas.
+- Capturas revisadas a 1280, 390 y 320 px en tema claro, oscuro, estado vacío y error.
+- Los fixtures son ficticios y se regeneran con `tests/fixtures/make_fixtures.py`.
+- Las pruebas Playwright viven fuera del repositorio para no añadir build ni dependencias.
+
+### Validación heredada del Hito 0
+
+Última pasada del panel: **2026-11-20**, Chrome estable en Windows, modo headless.
 
 - **51/51** comprobaciones funcionales: apertura, cierre, `Escape`, cambio de medio, foco, scroll, tema, carga de YouTube/Spotify, movimiento reducido y layouts de 390×844 y 320×568.
 - **5/5** comprobaciones de persistencia del tema, incluido el fallback al tema del sistema.
@@ -77,7 +91,7 @@ También puedes usar la extensión Live Server de VS Code.
 - **0** violaciones automáticas de axe-core en cuatro estados (claro/oscuro, panel abierto/cerrado, escritorio/móvil).
 - El iframe mantiene dimensiones constantes durante la animación y el documento conserva al menos el 45 % de la altura útil en móvil.
 
-**Pendiente:** probar en un móvil real, Safari, Firefox y con lector de pantalla. La emulación de Chrome no sustituye esas comprobaciones.
+**Pendiente:** probar ambos hitos en un móvil real, Safari, Firefox y con lector de pantalla. La emulación de Chrome no sustituye esas comprobaciones.
 
 ---
 
@@ -85,18 +99,19 @@ También puedes usar la extensión Live Server de VS Code.
 
 ```text
 WebMili/
-├─ index.html          # Shell, documento de ejemplo y panel
+├─ index.html          # Landing, lector, panel y estados
 ├─ css/
-│  └─ app.css          # Tokens, layout responsive, animación y tema
+│  └─ app.css          # Tokens, layout responsive, lector, animación y tema
 ├─ js/
-│  ├─ app.js           # Apertura/cierre, iframes, tamaño, scroll y foco
+│  ├─ app.js           # Carga, estados, preferencias, enlaces y panel
+│  ├─ docx.js          # Validación, Mammoth, DOMPurify y post-procesado
+│  ├─ storage.js       # Preferencias de tema y tamaño
 │  └─ theme-init.js    # Tema inicial antes del primer pintado
 ├─ assets/
 │  └─ favicon.svg
-├─ vendor/             # Librerías para el Hito 1 (aún no cargadas)
-│  ├─ mammoth.browser.min.js
-│  ├─ purify.min.js
-│  └─ LICENSE-*.txt
+├─ vendor/             # Mammoth 1.9.1 y DOMPurify 3.2.6 con licencias
+├─ tests/
+│  └─ fixtures/        # .docx ficticios y generador reproducible
 ├─ MEMORY.md           # Visión, decisiones y estado del proyecto
 ├─ REQUIREMENTS.md     # Historias, criterios de aceptación y alcance
 ├─ TECHNICAL-PLAN.md   # Arquitectura y detalles de implementación
@@ -105,13 +120,13 @@ WebMili/
 └─ RISKS.md            # Riesgos y limitaciones
 ```
 
-No hay dependencias externas en tiempo de ejecución: todo se sirve desde el repositorio. No se usan CDNs ni fuentes externas. `index.html` todavía no carga las librerías de `vendor/`.
+No hay dependencias externas en tiempo de ejecución: todo se sirve desde el repositorio. `index.html` carga Mammoth y DOMPurify desde `vendor/`; no se usan CDNs ni fuentes externas.
 
 ---
 
 ## Cómo se abre un medio
 
-Cada enlace del documento lleva sus datos en atributos:
+El panel de medios del Hito 0 sigue en `js/app.js`. Cuando el Hito 2 detecte enlaces de YouTube/Spotify, el Hito 3 les añadirá estos datos:
 
 ```html
 <a class="media-link media-link--youtube"
@@ -126,7 +141,7 @@ Cada enlace del documento lleva sus datos en atributos:
    aria-expanded="false">…</a>
 ```
 
-`js/app.js` valida el proveedor y la URL de embed, mide el panel, crea el `iframe` y lo destruye al cerrar. En el Hito 1, estos atributos se generarán desde los hipervínculos reales del `.docx`. El `iframe` permanece fuera del orden de tabulación hasta que termina de cargar.
+`js/app.js` valida el proveedor y la URL de embed, mide el panel, crea el `iframe` y lo destruye al cerrar. Mientras tanto, los enlaces de YouTube y Spotify de un `.docx` se tratan como enlaces externos normales: se abren en una pestaña nueva. El `iframe` permanece fuera del orden de tabulación hasta que termina de cargar.
 
 ---
 
@@ -158,7 +173,5 @@ Los detalles completos están en [`MEMORY.md`](MEMORY.md), [`DECISIONS.md`](DECI
 
 ## Créditos
 
-- **Big Buck Bunny** © Blender Foundation, licencia [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/). Video de ejemplo alojado en YouTube.
-- **Deep Focus** es una lista editorial de Spotify. La reproducción y disponibilidad dependen de Spotify.
-- **Mammoth.js** (BSD) y **DOMPurify 3.2.6** (Apache 2.0 / MPL 2.0) están vendorizados con sus licencias en `vendor/`.
+- **Mammoth.js 1.9.1** (BSD) y **DOMPurify 3.2.6** (Apache 2.0 / MPL 2.0) están vendorizados con sus licencias en `vendor/`.
 - Tipografías del sistema; no se carga ninguna fuente externa.

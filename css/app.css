@@ -673,12 +673,10 @@ a {
 }
 
 .doc-pane:focus {
+  /* Al abrir un documento el foco pasa aquí para permitir el desplazamiento
+     con teclado. El cambio de vista ya anuncia el contexto, así que no se
+     dibuja un anillo alrededor de toda la superficie de lectura. */
   outline: none;
-}
-
-.doc-pane:focus-visible {
-  outline: 2px solid var(--focus);
-  outline-offset: -3px;
 }
 
 .media-panel {

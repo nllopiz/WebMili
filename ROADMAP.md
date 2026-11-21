@@ -1,7 +1,8 @@
 # WebMili — Roadmap de implementación
 
-> **Estado:** Hito 0 implementado y validado en Chrome headless. Cierre formal pendiente de prueba manual en dispositivo real.
+> **Estado:** Hitos 0 y 1 implementados y validados en Chrome headless. Cierre formal de ambos pendiente de prueba manual en dispositivo real.
 > **Última actualización:** 2026-11-21
+> **Próximo hito:** Hito 2 — navegación y detección.
 > **Referencias:** [`REQUIREMENTS.md`](REQUIREMENTS.md) · [`TECHNICAL-PLAN.md`](TECHNICAL-PLAN.md) · [`RISKS.md`](RISKS.md)
 
 ---
@@ -70,22 +71,22 @@ Si la animación no es fluida o el iframe parpadea, se ajusta antes de invertir 
 
 **Historias:** A1, A2, A3, A4, A6; parte de D2 y D3.
 
-**Estado de partida:** Mammoth.js, DOMPurify 3.2.6 y sus licencias ya están en `vendor/`; el Hito 0 no los carga.
+**Estado:** implementado y validado automáticamente; cierre formal pendiente de prueba manual en móvil real, Safari/Firefox y lector de pantalla.
 
 ### Tareas
 
-- [ ] Implementar la landing con selector de archivo y drag & drop.
-- [ ] Validar `.docx`, tamaño y archivos múltiples.
-- [ ] Integrar Mammoth vendorizado y convertir el `.docx`.
-- [ ] Integrar DOMPurify y sanear el HTML antes de insertarlo.
-- [ ] Renderizar el documento con estilos de lectura.
-- [ ] Post-procesar tablas, imágenes, encabezados y enlaces.
-- [ ] Implementar enlaces internos y externos.
-- [ ] Neutralizar protocolos peligrosos.
-- [ ] Implementar tema claro/oscuro y tamaño de letra.
-- [ ] Mostrar estados de carga, error y documento vacío.
-- [ ] Crear documentos de prueba básicos.
-- [ ] Verificar que el documento no se sube a ningún servidor.
+- [x] Implementar la landing con selector de archivo y drag & drop.
+- [x] Validar `.docx`, tamaño y archivos múltiples.
+- [x] Integrar Mammoth vendorizado y convertir el `.docx`.
+- [x] Integrar DOMPurify y sanear el HTML antes de insertarlo.
+- [x] Renderizar el documento con estilos de lectura.
+- [x] Post-procesar tablas, imágenes, encabezados y enlaces.
+- [x] Implementar enlaces internos y externos.
+- [x] Neutralizar protocolos peligrosos.
+- [x] Implementar tema claro/oscuro y tamaño de letra.
+- [x] Mostrar estados de carga, error y documento vacío.
+- [x] Crear documentos de prueba básicos.
+- [x] Verificar que el documento no se sube a ningún servidor.
 
 ### Entregable
 
@@ -93,13 +94,23 @@ Lector funcional de `.docx` con estilos, enlaces y preferencias.
 
 ### Criterios de aceptación
 
-- [ ] Se abre un `.docx` real con títulos, listas, tablas, imágenes y enlaces.
-- [ ] El documento se ve bien en escritorio y móvil.
-- [ ] Los enlaces internos y externos funcionan.
-- [ ] Un enlace `javascript:` no ejecuta código.
-- [ ] El tema y el tamaño de letra persisten.
-- [ ] Los errores de archivo son comprensibles.
-- [ ] La interfaz sigue siendo usable con teclado.
+- [x] Se abre un `.docx` real con títulos, listas, tablas, imágenes y enlaces.
+- [x] El documento se ve bien en escritorio y móvil.
+- [x] Los enlaces internos y externos funcionan.
+- [x] Un enlace `javascript:` no ejecuta código.
+- [x] El tema y el tamaño de letra persisten.
+- [x] Los errores de archivo son comprensibles.
+- [x] La interfaz sigue siendo usable con teclado.
+
+### Validación automatizada
+
+- **11/11** pruebas Playwright en Chrome headless: landing, apertura, estructura, tabla, imagen, enlaces, `javascript:`/`data:`, ancla rota, documento vacío, PDF, varios archivos, persistencia, ausencia de subidas, drag & drop real, aviso de 20 MB, teclado y responsive a 320/1440 px.
+- **0** errores de página durante las pruebas.
+- Capturas revisadas a 1280, 390 y 320 px en tema claro, oscuro, estado vacío y error.
+- Los fixtures son ficticios y se regeneran con `tests/fixtures/make_fixtures.py`.
+- Las pruebas Playwright viven fuera del repositorio para no añadir build ni dependencias.
+
+**Pendiente para cerrar:** prueba manual en móvil real, Safari/Firefox y lector de pantalla. El criterio de escritorio/móvil está validado en viewports emulados, no en hardware real.
 
 ---
 

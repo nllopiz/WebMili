@@ -2,9 +2,9 @@
 
 > **Documento de entrada.** Leer antes de trabajar en WebMili.
 > **Última actualización:** 2026-11-21
-> **Estado:** Hito 0 implementado y validado con pruebas automatizadas en Chrome. Cierre formal pendiente de una prueba manual en dispositivo real.
+> **Estado:** Hitos 0 y 1 implementados y validados con pruebas automatizadas en Chrome. Cierre formal pendiente de una prueba manual en dispositivo real.
 > **Ubicación:** `C:\Users\norll\OneDrive\Documents\ProyectosSDD\WebMili`.
-> **Próximo paso:** Hito 1 — lector real de `.docx` con Mammoth y DOMPurify.
+> **Próximo paso:** Hito 2 — índice, parser de medios y badges.
 
 ---
 
@@ -51,6 +51,7 @@ El archivo nunca se sube a un servidor. Todo el procesamiento y el almacenamient
 | Librerías | Vanilla HTML/CSS/JS, módulos ES, sin framework y sin paso de build. Mammoth + DOMPurify vendorizados. |
 | Seguridad | El HTML generado por Mammoth se sanea con DOMPurify antes de insertarse. |
 | Medios | Un solo medio activo a la vez. Al abrir otro, se destruye el anterior. |
+| Foco del lector | El foco pasa al panel del documento para permitir el scroll con teclado, sin anillo alrededor de toda la superficie; «saltar al documento» apunta al primer encabezado. |
 
 ---
 
@@ -117,7 +118,7 @@ Estas limitaciones son reales y deben mencionarse si alguien propone cambiarlas:
 - **Tipo:** web estática, sin backend.
 - **Stack:** HTML5, CSS3, JavaScript moderno (módulos ES), sin framework.
 - **Build:** ninguno. Las librerías se guardan en `vendor/`.
-- **Hito 0:** la lógica del panel, el layout y el tema vive en `js/app.js` para validar el prototipo rápido. La separación en `docx.js`, `links.js`, `media.js`, `storage.js` y `ui.js` es el objetivo a partir del Hito 1.
+- **Hito 1:** `app.js` coordina la interfaz y el panel; `docx.js` concentra validación, Mammoth, DOMPurify y post-procesado; `storage.js` guarda preferencias. `links.js`, `media.js` y `ui.js` siguen pendientes.
 - **Documento:** Mammoth.js convierte el `.docx` en HTML semántico; DOMPurify lo sanea.
 - **Layout:** flexbox; el documento y el panel de medios tienen scroll interno.
 - **Animación:** se anima el contenedor externo del panel; el `iframe` mantiene su tamaño final dentro de un contenedor recortado para evitar parpadeos.
@@ -145,11 +146,11 @@ La estructura de archivos, el modelo de estado y los detalles de implementación
 
 ## 8. Estado actual y próximo paso
 
-### Hito 0 — implementado y validado
+### Hito 0 — implementado y validado (panel de medios)
 
-- Archivos: `index.html`, `css/app.css`, `js/app.js`, `js/theme-init.js`, `assets/favicon.svg` y `README.md`.
-- `vendor/` ya contiene Mammoth.js, DOMPurify 3.2.6 y sus licencias, preparados para el Hito 1. El Hito 0 no los carga.
-- Documento de ejemplo con texto, listas, tabla, dos enlaces multimedia reales y panel integrado.
+- Archivos del Hito 0: `index.html`, `css/app.css`, `js/app.js`, `js/theme-init.js`, `assets/favicon.svg` y `README.md`.
+- `vendor/` contiene Mammoth.js 1.9.1, DOMPurify 3.2.6 y sus licencias; el Hito 1 ya los carga desde `index.html`.
+- El panel de medios se conserva en el código; la validación original usó un documento de ejemplo con dos enlaces multimedia reales, ya retirado de la landing.
 - Escritorio en columnas y móvil en filas; panel arriba, documento abajo.
 - Apertura y cierre animados; el `iframe` conserva su tamaño final dentro de un contenedor recortado.
 - Al cerrar se destruye el `iframe`, se devuelve el foco al enlace y se conserva la posición de lectura.
@@ -160,14 +161,30 @@ La estructura de archivos, el modelo de estado y los detalles de implementación
   - **5/5** comprobaciones de persistencia del tema, incluido el fallback al tema del sistema.
   - **39/39** comprobaciones responsive en 320, 390, 768, 900, 1024 y 1440 px.
   - **0** violaciones automáticas de axe-core en cuatro estados (claro/oscuro, escritorio/móvil). Queda la revisión manual del iframe cross-origin y del contraste dentro de contenido recortado.
-- El Hito 0 todavía no carga archivos `.docx`, no usa Mammoth ni DOMPurify y no incluye índice, lista de medios, persistencia del documento ni control de tamaño de letra.
+- El panel sigue en el código, pero los enlaces del `.docx` todavía no lo activan: eso llega con los Hitos 2 y 3.
 - No hay `package.json` ni build: es un sitio estático con módulos ES.
+
+### Hito 1 — implementado y validado (lector real)
+
+- Archivos nuevos: `js/docx.js` (validación, Mammoth, DOMPurify y post-procesado), `js/storage.js` (preferencias) y `tests/fixtures/` (documentos ficticios y generador).
+- Landing con selector, drag & drop, validación `.docx`/`.doc`/PDF/vacío, aviso por encima de 20 MB y uso del primer archivo cuando llegan varios.
+- Mammoth 1.9.1 con `externalFileAccess: false`; DOMPurify 3.2.6 con allowlist; post-procesado solo con APIs del DOM.
+- Tablas envueltas en `.table-scroll` con `role="region"` y `tabindex="0"`; imágenes data URI con `loading="lazy"` y `decoding="async"`.
+- Encabezados con IDs únicos y `tabindex="-1"`; si un marcador vacío de Word coincide con el título, se reutiliza su ID y se retira el ancla redundante.
+- Enlaces externos con `noopener noreferrer`; `mailto:` y `tel:`; internos con scroll y foco; protocolos peligrosos sin `href` y marcados; anclas rotas marcadas.
+- Estados de carga, error y documento vacío; tema y tamaño de 16–24 px persistidos en `localStorage`.
+- El foco del lector no dibuja un anillo alrededor de todo el panel; el enlace «saltar» apunta al primer encabezado. Cada aviso programa su propia salida.
+- Fixtures: `lectura-basica.docx`, `enlaces-peligrosos.docx` y `documento-vacio.docx`; se regeneran con `python tests/fixtures/make_fixtures.py`.
+- Validación: **11/11** pruebas Playwright en Chrome headless (landing, estructura, tabla, imagen, enlaces, protocolos peligrosos, ancla rota, vacío, PDF, varios archivos, persistencia, ausencia de subidas, drag & drop real, aviso de 20 MB, teclado y responsive 320/1440). **0** errores de página.
+- Capturas revisadas a 1280, 390 y 320 px en tema claro/oscuro, estado vacío y error.
+- Las pruebas Playwright viven fuera del repositorio, en `%TEMP%\opencode\webmili-tests`, para no añadir `package.json` ni build.
 
 ### Cierre pendiente y próximo paso
 
-- Falta probar la fluidez y el scroll en un **móvil real** y en **Safari/Firefox**, además de una prueba de humo con lector de pantalla. La validación actual es Chrome headless con viewports emulados.
-- El siguiente paso es el **Hito 1 — lector real**: selector y drag & drop de `.docx`, Mammoth vendorizado, DOMPurify y render semántico.
-- No hay preguntas bloqueantes.
+- Falta probar la fluidez, el scroll y la lectura en un **móvil real** y en **Safari/Firefox**, además de una prueba de humo con lector de pantalla. La validación actual es Chrome headless con viewports emulados.
+- El Hito 1 está terminado en código y pruebas automatizadas; el siguiente paso es el **Hito 2 — navegación y detección**: índice jerárquico, parser puro de YouTube/Spotify, badges y lista de medios.
+- **Bloqueo:** no hay aprobación para crear el primer commit de WebMili. El repositorio sigue con **0 commits** y todos los archivos sin trackear. No hacer push ni desplegar.
+- No hay preguntas bloqueantes de producto.
 
 ### Cómo retomar el trabajo
 
@@ -188,7 +205,8 @@ La estructura de archivos, el modelo de estado y los detalles de implementación
 - **Detección automática de errores de embed:** mejora futura; en el MVP el enlace externo siempre está visible.
 - **Auto-detección de URLs en texto plano:** mejora futura, fuera del MVP.
 - **Pruebas automatizadas del parser:** recomendable; se decide al implementar el Hito 2.
-- **Validación real:** falta un móvil físico, Safari, Firefox y una prueba con lector de pantalla.
+- **Validación real:** falta un móvil físico, Safari, Firefox y una prueba con lector de pantalla para ambos hitos.
+- **Pruebas del lector:** los 11 casos Playwright viven fuera del repositorio; los fixtures sí están dentro y deben seguir siendo ficticios y regenerables.
 
 ---
 
@@ -203,7 +221,9 @@ La estructura de archivos, el modelo de estado y los detalles de implementación
 7. **No prometer reproducción completa de Spotify ni autoplay garantizado.**
 8. **No romper el patrón de un solo medio activo.** El cierre debe destruir el `iframe`.
 9. **No cambiar el alcance del MVP sin actualizar** `REQUIREMENTS.md`, `ROADMAP.md` y `MEMORY.md`.
-10. **Mantener el Hito 0 como referencia visual y de comportamiento.** Antes de dividir la lógica en módulos, conservar las pruebas y los criterios de aceptación del panel.
+10. **Mantener el panel del Hito 0 como referencia.** Sus pruebas y criterios siguen vigentes; el Hito 3 lo conectará a enlaces reales sin romperlo.
+11. **No commitear, hacer push ni desplegar sin aprobación explícita.** El primer commit local también requiere confirmación.
+12. **No incorporar documentos personales al repositorio.** Los fixtures deben ser ficticios y regenerables.
 
 ---
 

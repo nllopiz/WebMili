@@ -105,7 +105,6 @@ let resizeTimer = 0;
 let resizeFrame = 0;
 let announceTimer = 0;
 let anchorFrame = 0;
-let toastTimer = 0;
 let dragDepth = 0;
 
 /* ---------- Utilidades ---------- */
@@ -129,8 +128,8 @@ function showToast(message, tone = 'info', duration = 6500) {
   toast.append(text);
   toastRegion.append(toast);
 
-  window.clearTimeout(toastTimer);
-  toastTimer = window.setTimeout(() => {
+  // Cada aviso programa su propia salida; uno nuevo no cancela los anteriores.
+  window.setTimeout(() => {
     toast.classList.add('is-leaving');
     window.setTimeout(() => toast.remove(), motionQuery.matches ? 0 : 240);
   }, duration);
@@ -184,7 +183,11 @@ function setView(view, { focus = true } = {}) {
   docInfo.hidden = !reader;
   fontControls.hidden = !reader;
   openFileButton.hidden = !reader;
-  skipLink.setAttribute('href', reader ? '#doc-pane' : '#landing');
+
+  // El enlace «saltar» apunta al primer encabezado cuando existe, para que el
+  // foco visible quede sobre el título y no sobre toda la superficie de lectura.
+  const firstHeading = reader ? state.headings[0] : null;
+  skipLink.setAttribute('href', reader ? `#${firstHeading ? firstHeading.id : 'doc-pane'}` : '#landing');
   document.title = reader && state.doc ? `${state.doc.name} · WebMili` : TITLE_LANDING;
 
   if (!focus) {
