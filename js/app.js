@@ -1048,7 +1048,6 @@ function createIframe(media) {
   iframe.src = media.embedUrl;
   iframe.title = `${provider.frameTitle}: ${media.label}`;
   iframe.allow = provider.allow;
-  iframe.allowFullscreen = true;
   iframe.referrerPolicy = 'strict-origin-when-cross-origin';
   iframe.loading = 'eager';
 

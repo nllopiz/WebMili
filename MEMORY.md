@@ -4,7 +4,7 @@
 > **Última actualización:** 2026-11-21
 > **Estado:** Hitos 0–4 implementados. Quedan pendientes las pruebas manuales multiplataforma y el cierre final de publicación.
 > **Ubicación:** `C:\Users\norll\OneDrive\Documents\ProyectosSDD\WebMili`.
-> **Próximo paso:** Hito 2 — índice, parser de medios y badges.
+> **Próximo paso:** cierre final — pruebas manuales multiplataforma y lector de pantalla.
 
 ---
 

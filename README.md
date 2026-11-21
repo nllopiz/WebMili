@@ -2,8 +2,8 @@
 
 Lector local de documentos `.docx` con reproductor integrado de YouTube y Spotify. Aplicación web estática, sin backend, sin cuentas y sin subida de archivos.
 
-> **Estado actual: Hitos 0, 1, 2 y 3 implementados; falta cerrar las pruebas manuales y el Hito 4 de persistencia.**
-> La app abre un `.docx`, genera el índice de encabezados, reconoce enlaces de YouTube y Spotify, muestra una lista deduplicada y reproduce medios en el panel integrado.
+> **Estado actual: Hitos 0–4 implementados.**
+> La app abre un `.docx`, genera el índice de encabezados, reconoce enlaces de YouTube y Spotify, reproduce medios en el panel integrado y puede recordar el último documento con su posición.
 
 ---
 
@@ -26,10 +26,10 @@ Lector local de documentos `.docx` con reproductor integrado de YouTube y Spotif
 
 ## Qué no incluye todavía
 
-- Índice de contenidos y lista de medios (Hito 2).
-- Detección y badges de enlaces de YouTube/Spotify dentro del documento (Hito 2).
-- Reproductor conectado a enlaces reales del `.docx`: el panel existe, pero aún no recibe enlaces del documento (Hito 3).
-- Persistencia del documento y de la posición de lectura en IndexedDB.
+- Persistencia de varios documentos: solo se recuerda el último.
+- Sincronización entre dispositivos.
+- Anotaciones, búsqueda interna, edición o cola de reproducción.
+- Modo PWA/offline completo.
 - Prueba manual en móvil real, Safari/Firefox y lector de pantalla.
 
 Los documentos de ejemplo son ficticios y viven en `tests/fixtures/`. El orden de trabajo está en [`ROADMAP.md`](ROADMAP.md).

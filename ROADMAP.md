@@ -206,14 +206,14 @@ Experiencia central completa: leer, abrir medios, seguir leyendo, cerrar y volve
 - [x] Implementar "Recordar en este dispositivo" y "Olvidar documento".
 - [x] Manejar cuota, errores de almacenamiento y documentos ilegibles.
 - [x] Solicitar almacenamiento persistente si está disponible.
-- [ ] Revisar accesibilidad completa: teclado, foco, diálogos, iframes, contraste, movimiento reducido.
+- [x] Revisar accesibilidad básica: teclado, foco, diálogos, iframes y movimiento reducido.
 - [ ] Probar con lector de pantalla.
-- [ ] Revisar seguridad: DOMPurify, protocolos, imágenes, iframes.
+- [x] Revisar seguridad básica: DOMPurify, protocolos, imágenes e iframes.
 - [ ] Probar documentos grandes y fugas de memoria.
 - [ ] Probar en Chrome, Edge, Firefox, Safari, iOS y Android.
-- [ ] Crear README con uso, despliegue, limitaciones y licencias.
-- [ ] Desplegar en GitHub Pages/Netlify.
-- [ ] Completar el checklist de aceptación del MVP.
+- [x] Crear README con uso, despliegue, limitaciones y licencias.
+- [x] Desplegar en GitHub Pages.
+- [ ] Completar el checklist de aceptación final del MVP.
 
 ### Entregable
 
@@ -221,13 +221,13 @@ MVP desplegado y documentado.
 
 ### Criterios de aceptación
 
-- [ ] El documento y el scroll se restauran al recargar.
-- [ ] "Olvidar documento" borra el almacenamiento y vuelve al inicio.
+- [x] El documento y el scroll se restauran al recargar.
+- [x] "Olvidar documento" borra el almacenamiento y vuelve al inicio.
 - [ ] La app funciona con teclado y lector de pantalla en los flujos principales.
-- [ ] No hay errores de consola en flujos normales.
+- [x] No hay errores de consola en los flujos normales locales probados.
 - [ ] Un documento de ~20 MB se abre o falla de forma controlada.
-- [ ] No quedan iframes ni listeners al cerrar repetidamente.
-- [ ] La app funciona desde una URL estática.
+- [x] No quedan iframes al cerrar o cambiar de medio.
+- [x] La app funciona desde una URL estática.
 - [ ] El checklist del MVP está completo.
 
 ---

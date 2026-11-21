@@ -39,7 +39,7 @@
 | R-18 | El orden DOM/visual en móvil confunde a lectores de pantalla | Media | Medio | Documento primero en DOM; foco al cierre al abrir; probar con lector de pantalla | Aceptado |
 | R-19 | Los diálogos `<dialog>` se ven o comportan distinto en Safari/Firefox | Media | Bajo | Probar; estilos propios; fallback si fuera necesario | Abierto |
 | R-20 | Las librerías vendorizadas quedan desactualizadas o tienen una CVE | Baja | Medio | Registro de versiones; revisión periódica; licencias; actualizar manualmente | Abierto |
-| R-21 | No hay tests automatizados y una regresión pasa desapercibida | Media | Medio | Parser puro testeable; matriz manual; evaluar tests E2E después | Abierto |
+| R-21 | Las regresiones pasan desapercibidas | Media | Medio | Pruebas unitarias del parser y preferencias con `node:test`; matriz E2E manual en Chrome | Mitigado |
 | R-22 | La app no funciona offline en una carga desde cero | Alta | Bajo | Documentar; PWA fuera del MVP; el documento guardado se puede releer si la app ya está cargada | Aceptado |
 | R-23 | Las URLs en texto plano no se detectan | Alta | Bajo | Documentar; mejora futura de auto-link | Aceptado |
 | R-24 | Cambios en las políticas de YouTube/Spotify rompen embeds | Baja | Alto | Enlace externo; diseño desacoplado; revisar en pruebas | Aceptado |
@@ -71,7 +71,7 @@
 - **39/39** comprobaciones responsive en 320×568, 390×844, 768×1024, 900×800, 1024×768 y 1440×900, sin scroll horizontal.
 - **0** violaciones automáticas de axe-core en cuatro estados.
 - **Mitigados con evidencia:** R-05 (estabilidad del iframe), R-06 (scroll) y R-08 (tamaño del panel móvil).
-- **Siguen abiertos:** R-07 y R-09 por falta de hardware real; R-21 (las pruebas automatizadas viven fuera del repositorio).
+- **Siguen abiertos:** R-07 y R-09 por falta de hardware real.
 - **Aceptado y documentado:** R-17, porque `Escape` puede quedar capturado dentro del `iframe` cross-origin; el botón Cerrar sigue siendo la vía garantizada.
 - **Revisión manual pendiente:** Safari iOS, Firefox, un móvil Android real, contraste dentro de contenido recortado, iframe cross-origin y lector de pantalla.
 
